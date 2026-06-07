@@ -134,7 +134,9 @@ de mot de passe). Le backend bascule **automatiquement** :
 3. Dans `.env` :
    ```bash
    BREVO_SMTP_KEY=xsmtpsib-...
-   BREVO_SMTP_LOGIN=votre-email-de-compte@exemple.com
+   # ⚠ Le LOGIN est l'identifiant SMTP affiché par Brevo (xxxxx@smtp-brevo.com),
+   #   PAS l'email de votre compte — sinon erreur "535 Authentication failed".
+   BREVO_SMTP_LOGIN=xxxxx@smtp-brevo.com
    DEFAULT_FROM_EMAIL=EduTutor IA <no-reply@votre-domaine.fr>
    ```
 4. Redéployez : `bash scripts/redeploy.sh --fast` (ou `.ps1 -Fast` sous Windows)
