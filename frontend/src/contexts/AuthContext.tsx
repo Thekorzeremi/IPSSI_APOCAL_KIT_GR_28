@@ -11,7 +11,7 @@ import { me, login as apiLogin, logout as apiLogout, type User } from '@/api/aut
 type AuthContextValue = {
   user: User | null;
   isLoading: boolean;
-  login: (username: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
 };
@@ -34,8 +34,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const login = async (username: string, password: string) => {
-    const u = await apiLogin(username, password);
+  const login = async (email: string, password: string) => {
+    const u = await apiLogin(email, password);
     setUser(u);
   };
 

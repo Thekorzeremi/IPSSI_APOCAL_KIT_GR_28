@@ -8,8 +8,9 @@ export default function SignupPage() {
   const { refresh } = useAuth();
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -19,8 +20,14 @@ export default function SignupPage() {
     setError(null);
     setLoading(true);
     try {
-      await signup({ username, email, password });
+      await signup({
+        email,
+        password,
+        first_name: firstName || undefined,
+        last_name: lastName || undefined,
+      });
       await refresh();
+      // Un bandeau (dans le Layout) invitera ensuite à confirmer l'email.
       navigate('/upload', { replace: true });
     } catch (err) {
       setError(getApiErrorMessage(err, 'Inscription impossible.'));
@@ -48,28 +55,43 @@ export default function SignupPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Nom d'utilisateur
-            </label>
-            <input
-              type="text"
-              required
-              autoFocus
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="input"
-            />
-          </div>
-
-          <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
             <input
               type="email"
               required
+              autoFocus
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="input"
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Prénom <span className="text-slate-400 font-normal">(facultatif)</span>
+              </label>
+              <input
+                type="text"
+                autoComplete="given-name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="input"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Nom <span className="text-slate-400 font-normal">(facultatif)</span>
+              </label>
+              <input
+                type="text"
+                autoComplete="family-name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="input"
+              />
+            </div>
           </div>
 
           <div>
@@ -81,6 +103,7 @@ export default function SignupPage() {
               type="password"
               required
               minLength={8}
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="input"

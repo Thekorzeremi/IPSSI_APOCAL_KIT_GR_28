@@ -1,5 +1,6 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import VerifyEmailBanner from '@/components/VerifyEmailBanner';
 
 export default function Layout() {
   const { user, logout } = useAuth();
@@ -52,6 +53,9 @@ export default function Layout() {
           </nav>
         </div>
       </header>
+
+      {/* Bandeau d'invitation à confirmer l'email (validation "soft") */}
+      <VerifyEmailBanner />
 
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-8">
         <Outlet />

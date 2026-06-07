@@ -9,7 +9,7 @@ export default function LoginPage() {
   const location = useLocation();
   const from = (location.state as { from?: string } | null)?.from ?? '/upload';
 
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -19,7 +19,7 @@ export default function LoginPage() {
     setError(null);
     setLoading(true);
     try {
-      await login(username, password);
+      await login(email, password);
       navigate(from, { replace: true });
     } catch (err) {
       setError(getApiErrorMessage(err, 'Identifiants invalides.'));
@@ -47,24 +47,25 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Nom d'utilisateur
-            </label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
             <input
-              type="text"
+              type="email"
               required
               autoFocus
-              autoComplete="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="input"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Mot de passe
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-sm font-medium text-slate-700">Mot de passe</label>
+              <Link to="/forgot-password" className="text-xs text-indigo-600 hover:underline">
+                Mot de passe oublié ?
+              </Link>
+            </div>
             <input
               type="password"
               required
@@ -79,12 +80,6 @@ export default function LoginPage() {
             {loading ? 'Connexion…' : 'Se connecter'}
           </button>
         </form>
-
-        <p className="text-xs text-slate-500 mt-4 text-center">
-          Astuce dev : créez d'abord un user via{' '}
-          <code className="bg-slate-100 px-1 rounded">make seed</code> →
-          test / motdepasse123
-        </p>
       </div>
     </div>
   );
