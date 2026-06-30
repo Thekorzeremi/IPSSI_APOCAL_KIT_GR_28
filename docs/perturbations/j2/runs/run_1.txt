@@ -1,0 +1,36 @@
+```json
+{
+  "questions": [
+    {
+      "prompt": "Quelle est la fonction principale de la couche réseau dans le modèle OSI ?",
+      "options": [
+        "Gérer les connexions fiables entre les applications.",
+        "Utiliser des adresses IP pour router les paquets.",
+        "Gérer la transmission des bits sur le support physique.",
+        "Assurer la communication en 3 étapes SYN/SYN-ACK/ACK."
+      ],
+      "correct_index": 1
+    },
+    {
+      "prompt": "Quel protocole est associé à une connexion fiable et orientée flux dans le modèle OSI ?",
+      "options": [
+        "UDP",
+        "TCP",
+        "MAC",
+        "IP"
+      ],
+      "correct_index": 1
+    },
+    {
+      "prompt": "Quelle couche du modèle OSI utilise les adresses MAC ?",
+      "options": [
+        "Couche physique",
+        "Couche liaison",
+        "Couche transport",
+        "Couche réseau"
+      ],
+      "correct_index": 1
+    }
+  ]
+}
+```

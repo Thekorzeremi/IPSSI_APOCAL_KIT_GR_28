@@ -1,0 +1,27 @@
+```json
+{
+  "questions": [
+    {
+      "prompt": "Quelle est la fonction principale de la couche réseau du modèle OSI ?",
+      "options": ["Définir les protocoles de communication des données"],
+      "options": ["Utiliser les adresses IP pour router les paquets"],
+      "options": ["Gérer le flux de données entre les applications"],
+      "options": ["Assurer la transmission physique des données"]
+    },
+    {
+      "prompt": "Quel protocole est associé à une communication TCP fiable basée sur un modèle en 3 étapes ?",
+      "options": ["UDP"],
+      "options": ["TCP"],
+      "options": ["IPX"],
+      "options": ["ICMP"]
+    },
+    {
+      "prompt": "Quelle couche du modèle OSI utilise les adresses MAC pour la communication ?",
+      "options": ["Couche physique"],
+      "options": ["Couche liaison"],
+      "options": ["Couche réseau"],
+      "options": ["Couche transport"]
+    }
+  ]
+}
+```

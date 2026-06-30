@@ -1,0 +1,21 @@
+```json
+{
+  "questions": [
+    {
+      "prompt": "Quelle couche du modèle OSI est responsable de l'utilisation des adresses IP pour router les paquets ?",
+      "options": ["Couche physique", "Couche liaison", "Couche réseau", "Couche transport"],
+      "correct_index": 2
+    },
+    {
+      "prompt": "Quel protocole est associé à une connexion fiable en 3 étapes (SYN/SYN-ACK/ACK) au niveau de la couche transport ?",
+      "options": ["UDP", "TCP", "IP", "MAC"],
+      "correct_index": 1
+    },
+    {
+      "prompt": "Quelle est la principale différence entre TCP et UDP en termes de gestion des connexions ?",
+      "options": ["TCP est sans connexion, UDP est fiable.", "UDP est sans connexion, TCP est fiable.", "TCP est plus rapide, UDP est moins rapide.", "Les deux protocoles sont similaires."],
+      "correct_index": 1
+    }
+  ]
+}
+```
