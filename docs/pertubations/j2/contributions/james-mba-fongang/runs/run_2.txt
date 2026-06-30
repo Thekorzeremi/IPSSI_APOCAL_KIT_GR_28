@@ -1,0 +1,23 @@
+Voici trois questions QCM sur le cours du modèle OSI en JSON strict :
+
+```json
+{
+  "questions": [
+    {
+      "prompt": "Quelle couche utilise les adresses MAC pour la transmission de données ?",
+      "options": ["Couche Physique", "Couche Liaison", "Couche Transport", "Couche Réseau"],
+      "correct_index": 1
+    },
+    {
+      "prompt": "Quel protocole est utilisé pour établir une connexion fiable entre deux terminaux ?",
+      "options": ["TCP", "UDP", "HTTP", "FTP"],
+      "correct_index": 0
+    },
+    {
+      "prompt": "Quelle couche utilise les adresses IP pour router les paquets de données ?",
+      "options": ["Couche Liaison", "Couche Transport", "Couche Réseau", "Couche Physique"],
+      "correct_index": 2
+    }
+  ]
+}
+```

@@ -1,0 +1,23 @@
+Voici les 3 questions QCM en format JSON :
+
+```json
+{
+  "questions": [
+    {
+      "prompt": "Quelle couche utilise les adresses IP pour router les paquets ?",
+      "options": ["Couche Physique", "Couche Réseau", "Couche Transport", "Couche Application"],
+      "correct_index": 1
+    },
+    {
+      "prompt": "Lequel des protocoles suivants est utilisé pour une connexion en 3 étapes (SYN/SYN-ACK/ACK) ?",
+      "options": ["TCP", "UDP", "HTTP", "FTP"],
+      "correct_index": 0
+    },
+    {
+      "prompt": "Quelle couche gère la transmission des bits sur le support physique ?",
+      "options": ["Couche Réseau", "Couche Transport", "Couche Liaison", "Couche Physique"],
+      "correct_index": 3
+    }
+  ]
+}
+```

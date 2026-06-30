@@ -1,0 +1,36 @@
+Voici les 3 questions QCM générées en format JSON :
+
+```json
+{
+  "questions": [
+    {
+      "prompt": "Quel est l'objectif de la couche réseau dans le modèle OSI ?",
+      "options": [
+        "Gérer les connexions TCP et UDP",
+        "Router les paquets utilisant les adresses IP",
+        "Gérer les adresses MAC"
+      ],
+      "correct_index": 1
+    },
+    {
+      "prompt": "Quelle couche utilise les adresses MAC ?",
+      "options": [
+        "Couche réseau",
+        "Couche transport",
+        "Couche liaison"
+      ],
+      "correct_index": 2
+    },
+    {
+      "prompt": "Quel protocole de communication est utilisé par la couche transport pour établir une connexion fiable ?",
+      "options": [
+        "TCP (fiable, connexion en 3 étapes)",
+        "UDP (sans connexion, rapide)"
+      ],
+      "correct_index": 0
+    }
+  ]
+}
+```
+
+Ces questions sont basées sur le cours fourni et visent à vérifier la compréhension des éléments clés du modèle OSI.

@@ -1,0 +1,23 @@
+Voici 3 questions QCM en format JSON :
+
+```json
+{
+  "questions": [
+    {
+      "prompt": "Quelle est la fonction principale de la couche réseau du modèle OSI ?",
+      "options": ["Gérer les adresses MAC", "Router les paquets avec des adresses IP", "Transmettre des bits sur le support physique"],
+      "correct_index": 1
+    },
+    {
+      "prompt": "Quel protocole utilise la couche transport pour transmettre des données de manière fiable et en trois étapes ?",
+      "options": ["TCP", "UDP", "HTTP"],
+      "correct_index": 0
+    },
+    {
+      "prompt": "Quelle est l'adresse utilisée par la couche liaison du modèle OSI ?",
+      "options": ["Adresse IP", "Adresse MAC", "Adresse physique"],
+      "correct_index": 1
+    }
+  ]
+}
+```
