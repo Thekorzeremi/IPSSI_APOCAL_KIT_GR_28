@@ -1,0 +1,23 @@
+Voici trois questions QCM sur le cours du modèle OSI en format JSON strict :
+
+```json
+{
+  "questions": [
+    {
+      "prompt": "Quelle couche utilise les adresses MAC pour identifier les appareils réseau ?",
+      "options": ["Couche réseau", "Couche transport", "Couche liaison", "Couche physique"],
+      "correct_index": 2
+    },
+    {
+      "prompt": "La couche transport gère les protocoles TCP et UDP. Quel est le caractéristique de la communication TCP ?",
+      "options": ["Fiable, connexion établie en un seul paquet", "Sans connexion, rapide", "Fiable, connexion non établie", "Sans connexion, fiable"],
+      "correct_index": 0
+    },
+    {
+      "prompt": "Quelle couche gère la transmission des bits sur le support physique ?",
+      "options": ["Couche réseau", "Couche transport", "Couche liaison", "Couche physique"],
+      "correct_index": 3
+    }
+  ]
+}
+```
