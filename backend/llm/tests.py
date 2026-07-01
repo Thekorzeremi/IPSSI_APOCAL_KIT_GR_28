@@ -202,12 +202,12 @@ def test_validate_accepts_legitimate_varied_quiz():
     result = parse_and_validate_quiz(raw)
 
     print("\n" + "=" * 60)
-    print("QUIZ LÉGITIME — distribution des bonnes réponses :")
+    print("QUIZ LÉGITIME — distribution après shuffle des options :")
     print("=" * 60)
     labels = ["A", "B", "C", "D"]
     for i, q in enumerate(result, 1):
-        print(f"  Q{i}: bonne réponse = {labels[q['correct_index']]} (index {q['correct_index']})")
-    print("✓ Distribution variée → validation OK")
+        print(f"  Q{i}: bonne réponse = {labels[q['correct_index']]} (index {q['correct_index']}) — options mélangées")
+    print("✓ Distribution variée + shuffle appliqué → validation OK")
     print("=" * 60)
 
     assert len(result) == 10

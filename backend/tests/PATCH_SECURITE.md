@@ -178,8 +178,9 @@ des poids différents — le contenu `system` a une priorité plus élevée.
 
 ### 3. `backend/llm/tests.py`
 
-**Pourquoi :** Les tests existants ne couvraient pas la sécurité. On ajoute 9 tests
-unitaires qui s'exécutent sans appel réseau (pas de dépendance à Ollama).
+**Pourquoi :** Les tests existants ne couvraient pas la sécurité. On ajoute 10 tests
+unitaires dédiés à la sécurité, dont plusieurs ciblant la prompt injection. Ils s'exécutent
+sans appel réseau (pas de dépendance à Ollama).
 
 | Test | Ce qu'il vérifie |
 |------|-----------------|
@@ -218,7 +219,7 @@ docker compose exec backend pytest llm/tests.py -v -k "injection or system_promp
 
 ---
 
-## Ce que le patch NE couvre PAS (à traiter en J4)
+## Ce que le patch ne gère pas encore :
 
 | Limite | Risque | Mitigation recommandée |
 |--------|--------|----------------------|

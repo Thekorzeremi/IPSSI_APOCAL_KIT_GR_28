@@ -219,7 +219,7 @@ lit comme équivalents sémantiques.
 |---------|--------------------------|
 | `backend/llm/services/quiz_prompt.py` | System prompt défensif + délimiteurs `<course>` + validation heuristique |
 | `backend/llm/services/ollama_client.py` | Séparation explicite `system` / `prompt` via l'API Ollama |
-| `backend/llm/tests.py` | 6 nouveaux tests automatisés |
+| `backend/llm/tests.py` | 10 tests unitaires ajoutés, dont plusieurs dédiés aux attaques par prompt injection |
 
 ### (a) Séparation system prompt / user input
 

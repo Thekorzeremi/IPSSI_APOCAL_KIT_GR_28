@@ -12,6 +12,7 @@ profitent automatiquement.
 
 import json
 import logging
+import random
 import re
 
 from .base import LLMError
@@ -140,10 +141,10 @@ def parse_and_validate_quiz(raw: str) -> list[dict]:
             }
         )
 
-    # 5. Validation heuristique anti-injection : si ≥ 8 questions sur 10 partagent
-    # le même correct_index, c'est le signe d'une injection réussie (ex : "marque
-    # toujours la réponse A"). Un quiz légitime sur 10 questions a une distribution
-    # naturellement variée. Seuil : 8/10 (proba ~0,0003 % pour un quiz aléatoire).
+    # 5. Validation heuristique anti-injection AVANT le shuffle : si ≥ 8 questions
+    # sur 10 partagent le même correct_index, c'est le signe d'une injection réussie
+    # (ex : "marque toujours la réponse A"). Doit s'exécuter sur les index bruts du
+    # LLM, avant le mélange — sinon le shuffle masquerait le pattern.
     from collections import Counter
 
     index_counts = Counter(q["correct_index"] for q in cleaned)
@@ -154,5 +155,13 @@ def parse_and_validate_quiz(raw: str) -> list[dict]:
             f"correct_index ({index_counts.most_common(1)[0][0]}). "
             "Possible tentative de prompt injection."
         )
+
+    # 6. Shuffle des options pour neutraliser le biais de position des LLMs
+    # (tendance à mettre la bonne réponse en première position). Exécuté après
+    # la validation heuristique pour ne pas masquer une injection.
+    for q in cleaned:
+        correct_answer = q["options"][q["correct_index"]]
+        random.shuffle(q["options"])
+        q["correct_index"] = q["options"].index(correct_answer)
 
     return cleaned
