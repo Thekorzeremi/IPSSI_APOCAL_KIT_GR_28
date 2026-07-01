@@ -22,6 +22,7 @@ import MentionsLegalesPage from '@/pages/legal/MentionsLegalesPage';
 import ConfidentialitePage from '@/pages/legal/ConfidentialitePage';
 import CGUPage from '@/pages/legal/CGUPage';
 import CookiesPage from '@/pages/legal/CookiesPage';
+import PolitiqueRetentionPage from '@/pages/legal/PolitiqueRetentionPage';
 
 export default function App() {
   return (
@@ -44,6 +45,7 @@ export default function App() {
                 <Route path="legal/cgu" element={<CGUPage />} />
                 <Route path="legal/cookies" element={<CookiesPage />} />
 
+                <Route path="legal/politique-retention" element={<PolitiqueRetentionPage />} />
                 {/* Routes protégées */}
                 <Route
                   path="upload"
