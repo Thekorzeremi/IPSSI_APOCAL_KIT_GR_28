@@ -4,9 +4,14 @@ Ces tests servent d'exemples : signup, login, logout, accès protégé.
 Lancez : pytest accounts/
 """
 
+import hashlib
+import re
+
 import pytest
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
+
+from .models import DataRequest
 
 pytestmark = pytest.mark.django_db
 
@@ -147,6 +152,7 @@ def test_export_csv_format(auth_client):
 def test_export_no_data_leak_between_users(auth_client, db):
     """Un utilisateur A ne doit pas voir les données de l'utilisateur B."""
     from django.contrib.auth.models import User
+
     from quizzes.models import Quiz
 
     user_b = User.objects.create_user(
@@ -158,3 +164,68 @@ def test_export_no_data_leak_between_users(auth_client, db):
     data = response.json()
     quiz_titles = [q["title"] for q in data["quizzes"]]
     assert "Quiz de Bob" not in quiz_titles
+
+
+# ---------------------------------------------------------------------------
+# Tests suivi des demandes d'export — registre RGPD (J3-bis / J4)
+# ---------------------------------------------------------------------------
+
+_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+
+
+def test_export_json_creates_datarequest(auth_client, user):
+    """Un export JSON crée UNE ligne d'audit, complétée avec l'empreinte."""
+    assert DataRequest.objects.count() == 0
+
+    response = auth_client.get("/api/accounts/me/export/")
+    assert response.status_code == 200
+
+    assert DataRequest.objects.count() == 1
+    dr = DataRequest.objects.get()
+    assert dr.user == user
+    assert dr.request_type == DataRequest.RequestType.EXPORT
+    assert dr.status == DataRequest.Status.COMPLETED
+    assert dr.export_format == "json"
+    assert dr.responded_at is not None
+    assert _SHA256_RE.match(dr.file_hash), f"hash invalide : {dr.file_hash!r}"
+
+
+def test_export_hash_matches_file_content(auth_client):
+    """L'empreinte stockée correspond bien au fichier réellement remis."""
+    response = auth_client.get("/api/accounts/me/export/")
+    expected = hashlib.sha256(response.content).hexdigest()
+
+    dr = DataRequest.objects.latest("created_at")
+    assert dr.file_hash == expected
+
+
+def test_export_csv_records_format(auth_client):
+    """Un export CSV est tracé avec le bon format."""
+    response = auth_client.get("/api/accounts/me/export/?export_format=csv")
+    assert response.status_code == 200
+
+    dr = DataRequest.objects.latest("created_at")
+    assert dr.export_format == "csv"
+    assert dr.file_name.endswith(".csv")
+
+
+def test_export_requires_auth_creates_no_datarequest(client):
+    """Un appel non authentifié ne doit rien enregistrer dans le registre."""
+    client.get("/api/accounts/me/export/")
+    assert DataRequest.objects.count() == 0
+
+
+def test_export_audit_logs_included_in_payload(auth_client):
+    """Le second export contient l'historique du premier dans « audit_logs »."""
+    auth_client.get("/api/accounts/me/export/")
+    response = auth_client.get("/api/accounts/me/export/")
+    data = response.json()
+
+    assert len(data["audit_logs"]) >= 1
+    assert data["audit_logs"][0]["type"] == "Export des données (Art. 15 & 20)"
+
+
+def test_datarequest_str_without_user():
+    """Le __str__ reste lisible même si le compte a été supprimé (user null)."""
+    dr = DataRequest.objects.create(status=DataRequest.Status.RECEIVED)
+    assert "compte supprimé" in str(dr)

@@ -30,7 +30,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .emails import EmailError, send_password_reset_email, send_verification_email
-from .models import get_or_create_profile
+from .models import DataRequest, get_or_create_profile
 from .serializers import (
     ChangePasswordSerializer,
     DeleteAccountSerializer,
@@ -343,6 +343,19 @@ class GDPRExportView(APIView):
         timestamp = datetime.now(tz=timezone.utc).strftime("%Y%m%d_%H%M%S")
         filename_base = f"export_rgpd_{user.id}_{timestamp}"
 
+        # [J3-bis RGPD] Journal d'audit : on enregistre la demande d'export dès sa
+        # réception (registre des demandes / SAR). L'échec de journalisation ne
+        # doit JAMAIS empêcher l'utilisateur d'obtenir ses données.
+        data_request = None
+        try:
+            data_request = DataRequest.objects.create(
+                user=user,
+                request_type=DataRequest.RequestType.EXPORT,
+                status=DataRequest.Status.RECEIVED,
+            )
+        except Exception:  # noqa: BLE001 — journalisation best-effort
+            logger.warning("Échec d'enregistrement de la demande d'export RGPD", exc_info=True)
+
         # --- 1. Données de compte ---
         account_data = {
             "id": user.id,
@@ -388,8 +401,18 @@ class GDPRExportView(APIView):
         # --- 4. Signalements (fonctionnalité J4 — vide pour l'instant) ---
         signalements_data: list = []
 
-        # --- 5. Logs d'audit (fonctionnalité future — vide pour l'instant) ---
-        audit_logs_data: list = []
+        # --- 5. Logs d'audit RGPD : historique des demandes d'export du user ---
+        audit_logs_data = [
+            {
+                "type": dr.get_request_type_display(),
+                "status": dr.get_status_display(),
+                "format": dr.export_format,
+                "created_at": dr.created_at.isoformat(),
+                "responded_at": dr.responded_at.isoformat() if dr.responded_at else None,
+                "file_hash": dr.file_hash,
+            }
+            for dr in DataRequest.objects.filter(user=user).order_by("-created_at")
+        ]
 
         export_payload = {
             "export_date": datetime.now(tz=timezone.utc).isoformat(),
@@ -399,6 +422,19 @@ class GDPRExportView(APIView):
             "signalements": signalements_data,
             "audit_logs": audit_logs_data,
         }
+
+        def _finalize(content: str, extension: str) -> None:
+            """Clôt la ligne du registre RGPD : statut « répondue » + empreinte."""
+            if data_request is None:
+                return
+            try:
+                data_request.mark_completed(
+                    content=content.encode("utf-8"),
+                    file_name=f"{filename_base}.{extension}",
+                    export_format=extension,
+                )
+            except Exception:  # noqa: BLE001 — journalisation best-effort
+                logger.warning("Échec de finalisation du journal d'export RGPD", exc_info=True)
 
         if fmt == "csv":
             output = io.StringIO()
@@ -418,14 +454,18 @@ class GDPRExportView(APIView):
                     for key, value in q.items():
                         writer.writerow([f"quiz:{qid}:question:{q['index']}", key, value])
 
-            response = HttpResponse(output.getvalue(), content_type="text/csv; charset=utf-8")
+            csv_content = output.getvalue()
+            response = HttpResponse(csv_content, content_type="text/csv; charset=utf-8")
             response["Content-Disposition"] = f'attachment; filename="{filename_base}.csv"'
+            _finalize(csv_content, "csv")
             return response
 
         # JSON (défaut)
+        json_content = json.dumps(export_payload, ensure_ascii=False, indent=2)
         response = HttpResponse(
-            json.dumps(export_payload, ensure_ascii=False, indent=2),
+            json_content,
             content_type="application/json; charset=utf-8",
         )
         response["Content-Disposition"] = f'attachment; filename="{filename_base}.json"'
+        _finalize(json_content, "json")
         return response
