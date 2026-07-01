@@ -1,0 +1,21 @@
+```json
+{
+  "questions": [
+    {
+      "prompt": "Quelle couche de la modèle OSI utilise les adresses IP pour router les paquets ?",
+      "options": ["Couche application", "Couche réseau", "Couche liaison", "Couche physique"],
+      "correct_index": 1
+    },
+    {
+      "prompt": "Quel protocole de transmission est fiable et utilise la couche transport du modèle OSI ?",
+      "options": ["TCP/IP", "UDP/ICMP", "HTTP/FTP", "DNS/SNMP"],
+      "correct_index": 0
+    },
+    {
+      "prompt": "Quelle couche de la modèle OSI utilise les adresses MAC pour identifier les appareils sur un réseau local ?",
+      "options": ["Couche application", "Couche transport", "Couche liaison", "Couche physique"],
+      "correct_index": 2
+    }
+  ]
+}
+```

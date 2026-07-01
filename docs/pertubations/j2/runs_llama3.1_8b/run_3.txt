@@ -1,0 +1,40 @@
+Voici trois questions QCM en format JSON strict :
+
+```json
+{
+  "questions": [
+    {
+      "prompt": "Quelle est la fonction principale de la couche réseau dans le modèle OSI ?",
+      "options": [
+        "Gérer les adresses IP pour router les paquets",
+        "Gérer les adresses MAC pour la transmission des données",
+        "Transmettre les bits sur le support physique",
+        "Gérer les connexions TCP et UDP"
+      ],
+      "correct_index": 0
+    },
+    {
+      "prompt": "Quelle est la principale différence entre les protocoles TCP et UDP ?",
+      "options": [
+        "TCP est plus rapide que UDP",
+        "UDP est fiable tandis que TCP ne l'est pas",
+        "TCP utilise des connexions tandis que UDP non",
+        "La couche réseau gère TCP tandis que la couche transport gère UDP"
+      ],
+      "correct_index": 2
+    },
+    {
+      "prompt": "Quelle est la fonction principale de la couche liaison dans le modèle OSI ?",
+      "options": [
+        "Gérer les adresses MAC pour la transmission des données",
+        "Transmettre les bits sur le support physique",
+        "Router les paquets selon les adresses IP",
+        "Gérer les connexions TCP et UDP"
+      ],
+      "correct_index": 0
+    }
+  ]
+}
+```
+
+J'espère que ces questions seront utiles !

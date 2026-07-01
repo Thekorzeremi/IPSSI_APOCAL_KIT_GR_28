@@ -1,0 +1,23 @@
+Voici les 3 questions QCM sur le cours en format JSON strict :
+
+```json
+{
+    "questions": [
+        {
+            "prompt": "Quelle est la fonction de la couche réseau dans le modèle OSI ?",
+            "options": ["Gérer les connexions TCP", "Router les paquets avec des adresses IP", "Gérer les transmissions sur le support physique"],
+            "correct_index": 1
+        },
+        {
+            "prompt": "Quel protocole utilise la couche transport pour établir une connexion fiable ?",
+            "options": ["TCP", "UDP", "HTTP", "FTP"],
+            "correct_index": 0
+        },
+        {
+            "prompt": "Quelle est l'adresse utilisée par la couche liaison pour identifier les appareils sur un réseau local ?",
+            "options": ["Adresse IP", "Adresse MAC", "Adresse HTTP", "Adresse FTP"],
+            "correct_index": 1
+        }
+    ]
+}
+```

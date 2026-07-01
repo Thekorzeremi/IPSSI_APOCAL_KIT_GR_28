@@ -1,0 +1,21 @@
+```json
+{
+  "questions": [
+    {
+      "prompt": "Quelle couche du modèle OSI utilise les adresses IP pour router les paquets?",
+      "options": ["Couche réseau", "Couche liaison", "Couche transport", "Couche physique"],
+      "correct_index": 0
+    },
+    {
+      "prompt": "Quelles deux couches du modèle OSI gèrent la communication TCP et UDP ?",
+      "options": ["Couche réseau", "Couche liaison", "Couche transport", "Couche physique"],
+      "correct_index": 1
+    },
+    {
+      "prompt": "Quelle couche du modèle OSI utilise les adresses MAC?",
+      "options": ["Couche réseau", "Couche liaison", "Couche transport", "Couche physique"],
+      "correct_index": 2
+    }
+  ]
+}
+```

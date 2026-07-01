@@ -1,0 +1,23 @@
+Voici trois questions QCM sur le cours :
+
+```json
+{
+  "questions": [
+    {
+      "prompt": "Quelle couche utilise les adresses IP pour router les paquets ?",
+      "options": ["Couche liaison", "Couche réseau", "Couche transport", "Couche physique"],
+      "correct_index": 1
+    },
+    {
+      "prompt": "Quel protocole utilisé par la couche transport permet une connexion fiable en 3 étapes ?",
+      "options": ["TCP", "UDP", "HTTP", "FTP"],
+      "correct_index": 0
+    },
+    {
+      "prompt": "Quelle adresse est utilisée par la couche liaison pour identifier les appareils sur un réseau local ?",
+      "options": ["Adresse IP", "Adresse MAC", "Adresse TCP", "Adresse UDP"],
+      "correct_index": 1
+    }
+  ]
+}
+```
