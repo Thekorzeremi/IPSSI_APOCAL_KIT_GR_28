@@ -126,3 +126,30 @@ export async function deleteAccount(password: string): Promise<void> {
   await api.delete('/accounts/profile/', { data: { password } });
   clearToken();
 }
+
+// ---------------------------------------------------------------------------
+// Export RGPD (Art. 15) — J3-bis
+// ---------------------------------------------------------------------------
+
+/**
+ * Télécharge l'export RGPD du compte connecté.
+ * @param format 'json' (défaut) ou 'csv'
+ */
+export async function exportMyData(format: 'json' | 'csv' = 'json'): Promise<void> {
+  const response = await api.get(`/accounts/me/export/?export_format=${format}`, {
+    responseType: 'blob',
+  });
+
+  const disposition: string = response.headers['content-disposition'] ?? '';
+  const match = disposition.match(/filename="?([^"]+)"?/);
+  const filename = match ? match[1] : `export_rgpd.${format}`;
+
+  const url = URL.createObjectURL(new Blob([response.data]));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
