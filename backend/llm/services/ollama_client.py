@@ -12,7 +12,7 @@ import requests
 from django.conf import settings
 
 from .base import LLMClient, LLMError
-from .quiz_prompt import build_full_prompt, parse_and_validate_quiz
+from .quiz_prompt import SYSTEM_PROMPT, build_user_prompt, parse_and_validate_quiz
 
 
 class OllamaLLMClient(LLMClient):
@@ -29,21 +29,24 @@ class OllamaLLMClient(LLMClient):
         self.timeout = timeout or settings.OLLAMA_TIMEOUT
 
     def generate_quiz(self, source_text: str, title: str) -> list[dict]:
-        # Ollama /api/generate attend UN prompt unique (pas de séparation
-        # system/user) : on concatène donc system + cours via build_full_prompt.
-        prompt = build_full_prompt(source_text, title)
-        raw = self._call_ollama(prompt)
+        # Séparation explicite system/user : le system prompt est transmis dans le
+        # champ "system" de l'API Ollama (distinct du champ "prompt"), ce qui isole
+        # les instructions du modèle du contenu du cours fourni par l'utilisateur.
+        # Défense contre la prompt injection (perturbation J3).
+        user_prompt = build_user_prompt(source_text, title)
+        raw = self._call_ollama(user_prompt)
         return parse_and_validate_quiz(raw)
 
     # ----- internals -----
 
-    def _call_ollama(self, prompt: str) -> str:
+    def _call_ollama(self, user_prompt: str) -> str:
         try:
             response = requests.post(
                 f"{self.host}/api/generate",
                 json={
                     "model": self.model,
-                    "prompt": prompt,
+                    "system": SYSTEM_PROMPT,   # instructions système isolées du contenu
+                    "prompt": user_prompt,      # contenu utilisateur (cours)
                     "stream": False,
                     "options": {"temperature": 0.4},  # peu de créativité : on veut du factuel
                     "format": "json",  # mode JSON strict d'Ollama si supporté

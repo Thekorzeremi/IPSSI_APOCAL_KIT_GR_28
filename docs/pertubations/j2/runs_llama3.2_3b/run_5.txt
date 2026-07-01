@@ -1,0 +1,21 @@
+```json
+{
+  "questions": [
+    {
+      "prompt": "Quelle couche de la modelisation OSI utilise les adresses IP pour router les paquets ?",
+      "options": ["Couche liaison", "Couche physique", "Couche réseau", "Couche transport"],
+      "correct_index": 2
+    },
+    {
+      "prompt": "Quelles sont les deux couches de la modelisation OSI qui gèrent les protocoles de transmission de données ?",
+      "options": ["TCP et liaison", "UDP et physique", "TCP et UDP", "Couche transport et liaison"],
+      "correct_index": 3
+    },
+    {
+      "prompt": "Quelle couche de la modelisation OSI utilise les adresses MAC pour identifier les appareils réseau ?",
+      "options": ["Couche réseau", "Couche liaison", "Couche physique", "Couche transport"],
+      "correct_index": 1
+    }
+  ]
+}
+```

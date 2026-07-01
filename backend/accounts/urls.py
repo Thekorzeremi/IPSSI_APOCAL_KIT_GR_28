@@ -2,6 +2,7 @@ from django.urls import path
 
 from .views import (
     ChangePasswordView,
+    GDPRExportView,
     LoginView,
     LogoutView,
     MeView,
@@ -19,6 +20,8 @@ urlpatterns = [
     path("login/", LoginView.as_view(), name="login"),
     path("logout/", LogoutView.as_view(), name="logout"),
     path("me/", MeView.as_view(), name="me"),
+    # Export RGPD (Art. 15) — J3-bis
+    path("me/export/", GDPRExportView.as_view(), name="me-export"),
     # Validation d'email (lien reçu par email)
     path("verify-email/", VerifyEmailView.as_view(), name="verify-email"),
     path("resend-verification/", ResendVerificationView.as_view(), name="resend-verification"),

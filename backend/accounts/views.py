@@ -9,13 +9,19 @@ Endpoints d'authentification (Lot 3 : email-identifiant + validation + reset).
     POST /api/accounts/resend-verification/      — renvoyer l'email de validation
     POST /api/accounts/password-reset/           — demander un reset (envoie un email)
     POST /api/accounts/password-reset/confirm/   — définir le nouveau mot de passe
+    GET  /api/accounts/me/export/               — export RGPD Art. 15 (JSON ou CSV)
 """
 
+import csv
+import io
+import json
 import logging
+from datetime import datetime, timezone
 
 from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -303,3 +309,123 @@ class ChangePasswordView(APIView):
         Token.objects.filter(user=user).delete()
         token = Token.objects.create(user=user)
         return Response({"detail": "Mot de passe modifié.", "token": token.key})
+
+
+# ---------------------------------------------------------------------------
+# Export RGPD (Perturbation J3-bis — Art. 15 & Art. 20)
+# ---------------------------------------------------------------------------
+
+
+class GDPRExportView(APIView):
+    """Export de toutes les données personnelles du user connecté (Art. 15 RGPD).
+
+    GET /api/accounts/me/export/                   — format JSON (défaut)
+    GET /api/accounts/me/export/?export_format=csv  — format CSV
+
+    Filtre STRICTEMENT par request.user : un utilisateur ne peut jamais
+    recevoir les données d'un autre compte.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        responses={200: OpenApiResponse(description="Export RGPD (JSON ou CSV)")},
+        description=(
+            "Exporte l'intégralité des données personnelles du user connecté "
+            "(Art. 15 & Art. 20 RGPD). Format JSON par défaut, CSV via ?export_format=csv."
+        ),
+    )
+    def get(self, request):
+        from quizzes.models import Quiz
+
+        user = request.user
+        fmt = request.query_params.get("export_format", "json").lower()
+        timestamp = datetime.now(tz=timezone.utc).strftime("%Y%m%d_%H%M%S")
+        filename_base = f"export_rgpd_{user.id}_{timestamp}"
+
+        # --- 1. Données de compte ---
+        account_data = {
+            "id": user.id,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "date_joined": user.date_joined.isoformat(),
+            "last_login": user.last_login.isoformat() if user.last_login else None,
+        }
+
+        # --- 2. Profil ---
+        profile = get_or_create_profile(user)
+        profile_data = {
+            "email_verified": profile.email_verified,
+            "created_at": profile.created_at.isoformat(),
+        }
+
+        # --- 3. Quizz + questions + réponses (filtre strict par user) ---
+        quizzes_data = []
+        for quiz in Quiz.objects.filter(user=user).prefetch_related("questions").order_by("-created_at"):
+            questions_data = [
+                {
+                    "index": q.index,
+                    "prompt": q.prompt,
+                    "options": q.options,
+                    "correct_index": q.correct_index,
+                    "selected_index": q.selected_index,
+                }
+                for q in quiz.questions.all()
+            ]
+            quizzes_data.append(
+                {
+                    "id": quiz.id,
+                    "title": quiz.title,
+                    "source_text": quiz.source_text,
+                    "score": quiz.score,
+                    "created_at": quiz.created_at.isoformat(),
+                    "updated_at": quiz.updated_at.isoformat(),
+                    "questions": questions_data,
+                }
+            )
+
+        # --- 4. Signalements (fonctionnalité J4 — vide pour l'instant) ---
+        signalements_data: list = []
+
+        # --- 5. Logs d'audit (fonctionnalité future — vide pour l'instant) ---
+        audit_logs_data: list = []
+
+        export_payload = {
+            "export_date": datetime.now(tz=timezone.utc).isoformat(),
+            "account": account_data,
+            "profile": profile_data,
+            "quizzes": quizzes_data,
+            "signalements": signalements_data,
+            "audit_logs": audit_logs_data,
+        }
+
+        if fmt == "csv":
+            output = io.StringIO()
+            writer = csv.writer(output)
+            writer.writerow(["section", "key", "value"])
+
+            for key, value in account_data.items():
+                writer.writerow(["account", key, value])
+            for key, value in profile_data.items():
+                writer.writerow(["profile", key, value])
+            for quiz in quizzes_data:
+                qid = quiz["id"]
+                for key, value in quiz.items():
+                    if key != "questions":
+                        writer.writerow([f"quiz:{qid}", key, value])
+                for q in quiz["questions"]:
+                    for key, value in q.items():
+                        writer.writerow([f"quiz:{qid}:question:{q['index']}", key, value])
+
+            response = HttpResponse(output.getvalue(), content_type="text/csv; charset=utf-8")
+            response["Content-Disposition"] = f'attachment; filename="{filename_base}.csv"'
+            return response
+
+        # JSON (défaut)
+        response = HttpResponse(
+            json.dumps(export_payload, ensure_ascii=False, indent=2),
+            content_type="application/json; charset=utf-8",
+        )
+        response["Content-Disposition"] = f'attachment; filename="{filename_base}.json"'
+        return response

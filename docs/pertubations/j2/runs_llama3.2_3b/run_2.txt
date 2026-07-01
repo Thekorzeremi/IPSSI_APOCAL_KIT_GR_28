@@ -1,0 +1,21 @@
+```json
+{
+  "questions": [
+    {
+      "prompt": "Quelle couche de modélisation OSI utilise les adresses IP?",
+      "options": ["La couche réseau", "La couche transport", "La couche liaison", "La couche physique"],
+      "correct_index": 0
+    },
+    {
+      "prompt": "Quels protocoles sont gérés par la couche transport ?",
+      "options": ["TCP et UDP", "TCP uniquement", "UDP uniquement", "Sans connexion ni fiables"],
+      "correct_index": 0
+    },
+    {
+      "prompt": "Quelle couche de modélisation OSI utilise les adresses MAC?",
+      "options": ["La couche réseau", "La couche transport", "La couche liaison", "La couche physique"],
+      "correct_index": 1
+    }
+  ]
+}
+```

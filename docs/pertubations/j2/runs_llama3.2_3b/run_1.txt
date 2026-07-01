@@ -1,0 +1,21 @@
+```json
+{
+  "questions": [
+    {
+      "prompt": "Quelle couche de modèle OSI utilise les adresses IP pour router les paquets ?",
+      "options": ["La couche liaison", "La couche réseau", "La couche transport", "La couche physique"],
+      "correct_index": 1
+    },
+    {
+      "prompt": "Le protocole TCP est un exemple de quel type de connexion réseau ?",
+      "options": ["Sans connexion", "Fiable, connexion en 3 étapes SYN/SYN-ACK/ACK", "Non spécifié", "Non réseau"],
+      "correct_index": 1
+    },
+    {
+      "prompt": "La couche transport gère lequel des deux protocoles suivants ?",
+      "options": ["TCP et UDP", "TCP et ICMP", "UDP et ICMP", "TCP et ICMP non"],
+      "correct_index": 0
+    }
+  ]
+}
+```

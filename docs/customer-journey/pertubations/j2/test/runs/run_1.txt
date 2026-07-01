@@ -1,0 +1,38 @@
+Voici les 3 questions QCM en format JSON :
+
+```json
+{
+    "questions": [
+        {
+            "prompt": "Quelle est la fonction principale de la couche réseau du modèle OSI ?",
+            "options": [
+                "Gérer les adresses TCP/IP pour router les paquets.",
+                "Gérer les adresses MAC pour les paquets réseau.",
+                "Router les paquets en utilisant les adresses IP.",
+                "Faire transmettre des bits sur le support physique."
+            ],
+            "correct_index": 2
+        },
+        {
+            "prompt": "Quel est l'un des principaux avantages de TCP par rapport à UDP ?",
+            "options": [
+                "Il ne nécessite pas de connexion établie avant de transmettre les données.",
+                "Il est plus rapide que UDP pour les transferts de données importants.",
+                "Il gère la fiabilité et la synchronisation des données entre deux hôtes.",
+                "Il utilise moins de ressources du système pour les transferts de données."
+            ],
+            "correct_index": 2
+        },
+        {
+            "prompt": "Quelle couche du modèle OSI est responsable de la transmission physique des bits sur le support physique ?",
+            "options": [
+                "Couche réseau",
+                "Couche transport",
+                "Couche liaison",
+                "Couche physique"
+            ],
+            "correct_index": 3
+        }
+    ]
+}
+```
