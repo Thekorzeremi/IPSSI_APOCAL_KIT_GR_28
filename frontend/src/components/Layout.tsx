@@ -119,6 +119,9 @@ export default function Layout() {
             <Link to="/legal/cookies" className="hover:text-indigo-600">
               Cookies
             </Link>
+            <Link to="/legal/politique-retention" className="hover:text-indigo-600">
+              Rétention des données
+            </Link>
           </nav>
 
           <div className="flex flex-wrap items-center justify-between gap-3">

@@ -1,0 +1,10 @@
+# Override local — remplace les ports en conflit avec d'autres projets Docker.
+# Ce fichier est lu automatiquement par docker compose (pas besoin de -f).
+# Il est gitignore-able : chaque dev l'adapte à sa machine.
+services:
+  backend:
+    ports:
+      - "8001:8000"
+  frontend:
+    ports:
+      - "3001:3000"
