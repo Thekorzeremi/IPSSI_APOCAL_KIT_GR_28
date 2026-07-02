@@ -13,11 +13,15 @@ Les fournisseurs au format DIFFÉRENT (Ollama, Anthropic, Gemini) gardent, eux,
 leur propre client dédié.
 """
 
+import logging
+
 import requests
 from django.conf import settings
 
 from .base import LLMClient, LLMError
 from .quiz_prompt import SYSTEM_PROMPT, build_user_prompt, parse_and_validate_quiz
+
+logger = logging.getLogger(__name__)
 
 
 class OpenAICompatibleClient(LLMClient):
@@ -48,9 +52,18 @@ class OpenAICompatibleClient(LLMClient):
                 + "Ou utilisez LLM_BACKEND=ollama (gratuit, local) pour le développement."
             )
 
+    MAX_ATTEMPTS = 3
+
     def generate_quiz(self, source_text: str, title: str) -> list[dict]:
-        raw = self._call(source_text, title)
-        return parse_and_validate_quiz(raw)
+        last_error: LLMError | None = None
+        for attempt in range(1, self.MAX_ATTEMPTS + 1):
+            try:
+                raw = self._call(source_text, title)
+                return parse_and_validate_quiz(raw)
+            except LLMError as exc:
+                last_error = exc
+                logger.warning("[%s] Tentative %d/%d échouée : %s", self.provider_label, attempt, self.MAX_ATTEMPTS, exc)
+        raise LLMError(f"Échec après {self.MAX_ATTEMPTS} tentatives. Dernière erreur : {last_error}") from last_error
 
     # ----- internals -----
 

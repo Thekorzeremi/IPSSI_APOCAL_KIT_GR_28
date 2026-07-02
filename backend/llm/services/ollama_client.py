@@ -8,8 +8,12 @@ souveraineté des données + zéro coût. Sa contrepartie est la latence sur CPU
 quiz_prompt.py et partagés avec les clients OpenAI / Claude.
 """
 
+import logging
+
 import requests
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 from .base import LLMClient, LLMError
 from .quiz_prompt import SYSTEM_PROMPT, build_user_prompt, parse_and_validate_quiz
@@ -28,14 +32,22 @@ class OllamaLLMClient(LLMClient):
         # 8B sur CPU peut dépasser largement 120 s (cf. perturbation J2 latence).
         self.timeout = timeout or settings.OLLAMA_TIMEOUT
 
+    MAX_ATTEMPTS = 3  # 1 essai initial + 2 relances si la validation échoue
+
     def generate_quiz(self, source_text: str, title: str) -> list[dict]:
-        # Séparation explicite system/user : le system prompt est transmis dans le
-        # champ "system" de l'API Ollama (distinct du champ "prompt"), ce qui isole
-        # les instructions du modèle du contenu du cours fourni par l'utilisateur.
-        # Défense contre la prompt injection (perturbation J3).
+        # Séparation explicite system/user + retry sur échec de validation.
+        # Si le LLM renvoie un JSON invalide ou suspect (injection détectée),
+        # on relance jusqu'à MAX_ATTEMPTS avant de remonter l'erreur.
         user_prompt = build_user_prompt(source_text, title)
-        raw = self._call_ollama(user_prompt)
-        return parse_and_validate_quiz(raw)
+        last_error: LLMError | None = None
+        for attempt in range(1, self.MAX_ATTEMPTS + 1):
+            try:
+                raw = self._call_ollama(user_prompt)
+                return parse_and_validate_quiz(raw)
+            except LLMError as exc:
+                last_error = exc
+                logger.warning("Tentative %d/%d échouée : %s", attempt, self.MAX_ATTEMPTS, exc)
+        raise LLMError(f"Échec après {self.MAX_ATTEMPTS} tentatives. Dernière erreur : {last_error}") from last_error
 
     # ----- internals -----
 

@@ -24,6 +24,27 @@ logger = logging.getLogger(__name__)
 # on garde une limite commune pour des coûts/latences maîtrisés.
 MAX_SOURCE_CHARS = 8000
 
+# Patterns HTML/Markdown retirés du texte source avant envoi au LLM.
+# Objectif : supprimer les vecteurs d'injection cachés (texte blanc sur blanc,
+# commentaires HTML, balises de style) sans altérer le contenu pédagogique.
+_HTML_TAG_RE = re.compile(r"<[^>]{0,200}>", re.DOTALL)
+_HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
+_MARKDOWN_RE = re.compile(r"[*_`~#]{1,3}")
+
+
+def sanitize_source(text: str) -> str:
+    """Retire les balises HTML, commentaires et marqueurs Markdown du texte source.
+
+    Ne filtre PAS par mots-clés — on ne cherche pas à bloquer "IGNORE",
+    on retire les vecteurs de camouflage (invisible text, HTML comments…).
+    Le contenu textuel reste intact pour que le LLM puisse générer les questions.
+    """
+    text = _HTML_COMMENT_RE.sub(" ", text)
+    text = _HTML_TAG_RE.sub(" ", text)
+    text = _MARKDOWN_RE.sub("", text)
+    # Normalise les espaces multiples créés par les suppressions
+    return re.sub(r" {2,}", " ", text).strip()
+
 SYSTEM_PROMPT = """Tu es un assistant pédagogique francophone spécialisé en
 génération de QCM. À partir du cours fourni entre les balises <course> et </course>,
 tu génères exactement 10 questions à choix multiples pour aider un étudiant à réviser.
@@ -57,14 +78,14 @@ Format de sortie :
 def build_user_prompt(source_text: str, title: str) -> str:
     """Construit le message utilisateur (cours + consigne finale).
 
-    Le contenu du cours est encadré par des balises <course>...</course> pour
-    signaler explicitement au modèle la frontière entre données et instructions.
-    Cette séparation structurelle est la première ligne de défense contre l'injection.
+    Le texte est d'abord sanitisé (HTML/Markdown retirés) pour supprimer les
+    vecteurs de camouflage, puis encadré par <course>...</course> pour signaler
+    au modèle que c'est du contenu à analyser, pas des instructions.
     """
-    truncated = source_text[:MAX_SOURCE_CHARS]
+    clean = sanitize_source(source_text)[:MAX_SOURCE_CHARS]
     return (
         f"TITRE DU COURS : {title}\n\n"
-        f"<course>\n{truncated}\n</course>\n\n"
+        f"<course>\n{clean}\n</course>\n\n"
         f"GÉNÈRE LE JSON MAINTENANT :"
     )
 
@@ -128,6 +149,8 @@ def parse_and_validate_quiz(raw: str) -> list[dict]:
             raise LLMError(f"Question {i} : il faut exactement 4 options.")
         if not all(isinstance(o, str) and o.strip() for o in options):
             raise LLMError(f"Question {i} : options invalides.")
+        if not all(len(o.strip()) >= 10 for o in options):
+            raise LLMError(f"Question {i} : chaque option doit faire au moins 10 caractères.")
         if len({o.strip().lower() for o in options}) != 4:
             raise LLMError(f"Question {i} : les 4 options doivent être distinctes.")
         if not isinstance(correct_index, int) or correct_index not in (0, 1, 2, 3):
